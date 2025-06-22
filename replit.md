@@ -112,6 +112,13 @@ Fairfare is a modern web application that allows users to compare cab prices acr
   - Created query client configuration with proper API request setup
   - Removed explicit React imports to work with Vite JSX transformer
   - Verified application loads and functions correctly on port 5000
+- June 22, 2025: Added PostgreSQL database integration
+  - Created database schema with users table (id, username, email, password, points, createdAt)
+  - Implemented Drizzle ORM with Neon serverless PostgreSQL connection
+  - Built API endpoints for user registration, login, and profile management
+  - Updated Login component with registration/login toggle functionality
+  - Migrated from in-memory storage to database storage with real user persistence
+  - Successfully tested user registration - first user created with ID 1
 
 ## User Preferences
 
