@@ -60,7 +60,7 @@ const SearchForm = ({ onSearch }: SearchFormProps) => {
       const futureTime = new Date(today.getTime() + 15 * 60000); // Add 15 minutes
       return futureTime.toTimeString().slice(0, 5);
     }
-    return "06:00"; // Minimum booking time for future dates
+    return "00:00"; // Allow any time for future dates
   };
 
   // Validate time selection
@@ -77,12 +77,7 @@ const SearchForm = ({ onSearch }: SearchFormProps) => {
       }
     }
     
-    // Check for reasonable booking hours (6 AM to 11 PM)
-    const [hours] = newTime.split(':').map(Number);
-    if (hours < 6 || hours >= 23) {
-      alert('Cab bookings are available between 6:00 AM and 11:00 PM');
-      return;
-    }
+    // Allow 24/7 booking - no time restrictions
     
     setTime(newTime);
   };
@@ -235,7 +230,6 @@ const SearchForm = ({ onSearch }: SearchFormProps) => {
                 value={time}
                 onChange={(e) => handleTimeChange(e.target.value)}
                 min={getMinTime()}
-                max="23:00"
                 className="h-12 text-lg border-2 border-yellow-500 focus:border-yellow-400 transition-colors bg-black text-white"
                 required
               />

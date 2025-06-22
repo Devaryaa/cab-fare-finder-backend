@@ -11,8 +11,9 @@ interface PriceComparisonProps {
 const PriceComparison = ({ services, onSelectService }: PriceComparisonProps) => {
   const cheapestPrice = Math.min(...services.map(s => s.price));
   const fastestService = services.reduce((prev, current) => {
-    const prevTime = parseInt(prev.estimatedTime);
-    const currentTime = parseInt(current.estimatedTime);
+    // Extract numeric value from time strings like "25 min"
+    const prevTime = parseInt(prev.estimatedTime.replace(/\D/g, ''));
+    const currentTime = parseInt(current.estimatedTime.replace(/\D/g, ''));
     return prevTime < currentTime ? prev : current;
   });
 
@@ -27,7 +28,7 @@ const PriceComparison = ({ services, onSelectService }: PriceComparisonProps) =>
             </div>
             <div>
               <p className="text-sm font-medium text-yellow-500">Best Price</p>
-              <p className="text-2xl font-bold text-white">${cheapestPrice}</p>
+              <p className="text-2xl font-bold text-white">₹{cheapestPrice}</p>
             </div>
           </div>
         </div>

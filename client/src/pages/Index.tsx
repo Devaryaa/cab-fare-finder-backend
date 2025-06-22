@@ -73,33 +73,27 @@ const Index = () => {
         throw new Error('Unable to calculate Uber fares');
       }
       
-      // Try to get real Namma Yatri fares
-      let nammaYatriFares = [];
-      try {
-        nammaYatriFares = await FareCalculator.getNammaYatriFares(searchData.pickup, searchData.destination);
-      } catch (error) {
-        console.log('Namma Yatri API unavailable, using estimated fares');
-        // Create estimated Namma Yatri fare
-        const estimatedNammaFare = {
-          serviceId: 'namma-yatri',
-          serviceName: 'Namma Yatri',
-          vehicleType: 'Auto',
-          fare: {
-            baseFare: 20,
-            distanceFare: route.distance * 10,
-            timeFare: 0,
-            surgeMultiplier: 1.0,
-            platformFee: Math.min(5, route.distance * 0.5),
-            taxes: 0,
-            total: 20 + (route.distance * 10) + Math.min(5, route.distance * 0.5)
-          },
-          estimatedTime: route.durationText,
-          features: ['Open Source', 'No Surge Pricing', 'Driver Friendly'],
-          estimateId: undefined,
-          searchId: undefined
-        };
-        nammaYatriFares = [estimatedNammaFare];
-      }
+      // Always include Namma Yatri with calculated fares (API often unavailable)
+      const nammaYatriFare = {
+        serviceId: 'namma-yatri',
+        serviceName: 'Namma Yatri',
+        vehicleType: 'Auto',
+        fare: {
+          baseFare: 25,
+          distanceFare: route.distance * 12,
+          timeFare: 0,
+          surgeMultiplier: 1.0,
+          platformFee: Math.min(10, route.distance * 0.8),
+          taxes: 0,
+          total: 25 + (route.distance * 12) + Math.min(10, route.distance * 0.8)
+        },
+        estimatedTime: route.durationText,
+        features: ['Open Source', 'No Surge Pricing', 'Driver Friendly', 'Transparent Pricing'],
+        estimateId: undefined,
+        searchId: undefined
+      };
+      
+      const nammaYatriFares = [nammaYatriFare];
       
       const allFares = [olafares, uberFares, ...nammaYatriFares];
       
