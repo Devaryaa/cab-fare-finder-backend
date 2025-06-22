@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Car, Zap, Shield, Clock } from 'lucide-react';
 import SearchForm, { SearchData } from '../components/SearchForm';
 import PriceComparison from '../components/PriceComparison';
