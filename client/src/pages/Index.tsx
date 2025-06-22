@@ -82,7 +82,9 @@ const Index = () => {
             total: 20 + (route.distance * 10) + Math.min(5, route.distance * 0.5)
           },
           estimatedTime: route.durationText,
-          features: ['Open Source', 'No Surge Pricing', 'Driver Friendly']
+          features: ['Open Source', 'No Surge Pricing', 'Driver Friendly'],
+          estimateId: undefined,
+          searchId: undefined
         };
         nammaYatriFares = [estimatedNammaFare];
       }

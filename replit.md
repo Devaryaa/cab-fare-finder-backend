@@ -126,6 +126,12 @@ Fairfare is a modern web application that allows users to compare cab prices acr
   - Implemented real fare calculation algorithms for Ola and Uber
   - Added deep linking functionality to redirect users to actual cab booking apps
   - Enhanced SearchForm with location-based search and current location detection
+- June 22, 2025: Fixed location search with comprehensive city coverage
+  - Created SimpleLocationSearch component with extensive Bengaluru and Chandigarh locations
+  - Added Indranagar and 50+ popular areas including malls, transit hubs, and neighborhoods
+  - Implemented fallback distance calculation using Haversine formula when Google Maps API unavailable
+  - Fixed fare calculation system to work independently of external map services
+  - Users can now search for specific areas like Indranagar, Koramangala, Sector 17 Chandigarh, etc.
 
 ## User Preferences
 
