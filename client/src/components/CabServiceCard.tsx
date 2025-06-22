@@ -18,6 +18,9 @@ export interface CabService {
   features: string[];
   isRecommended?: boolean;
   carType: string;
+  estimateId?: string;
+  searchId?: string;
+  serviceData?: any;
 }
 
 interface CabServiceCardProps {

@@ -1,32 +1,68 @@
 
-import React, { useState } from 'react';
-import { MapPin, Calendar, Clock, Search } from 'lucide-react';
+import { useState } from 'react';
+import { MapPin, Calendar, Clock, Search, ArrowUpDown, Navigation } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
+import LocationSearch from './LocationSearch';
+import { LocationData } from '@/lib/googleMaps';
 
 interface SearchFormProps {
   onSearch: (data: SearchData) => void;
 }
 
 export interface SearchData {
-  pickup: string;
-  destination: string;
+  pickup: LocationData;
+  destination: LocationData;
   date: string;
   time: string;
 }
 
 const SearchForm = ({ onSearch }: SearchFormProps) => {
-  const [formData, setFormData] = useState<SearchData>({
-    pickup: '',
-    destination: '',
-    date: '',
-    time: ''
-  });
+  const [pickup, setPickup] = useState<LocationData | null>(null);
+  const [destination, setDestination] = useState<LocationData | null>(null);
+  const [date, setDate] = useState('');
+  const [time, setTime] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSearch(formData);
+    if (pickup && destination) {
+      onSearch({ pickup, destination, date, time });
+    }
+  };
+
+  const swapLocations = () => {
+    const temp = pickup;
+    setPickup(destination);
+    setDestination(temp);
+  };
+
+  const getCurrentLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          try {
+            const response = await fetch(
+              `https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.coords.latitude},${position.coords.longitude}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`
+            );
+            const data = await response.json();
+            if (data.results[0]) {
+              setPickup({
+                address: data.results[0].formatted_address,
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+                placeId: data.results[0].place_id
+              });
+            }
+          } catch (error) {
+            console.error('Error getting current location:', error);
+          }
+        },
+        (error) => {
+          console.error('Error getting location:', error);
+        }
+      );
+    }
   };
 
   return (
@@ -39,14 +75,21 @@ const SearchForm = ({ onSearch }: SearchFormProps) => {
                 <MapPin className="h-4 w-4 text-yellow-500" />
                 Pickup Location
               </label>
-              <Input
-                type="text"
-                placeholder="Enter pickup address"
-                value={formData.pickup}
-                onChange={(e) => setFormData({ ...formData, pickup: e.target.value })}
-                className="h-12 text-lg border-2 border-yellow-500 focus:border-yellow-400 transition-colors bg-black text-white placeholder:text-gray-400"
-                required
-              />
+              <div className="flex gap-2">
+                <LocationSearch
+                  placeholder="Enter pickup address"
+                  value={pickup?.address || ''}
+                  onChange={setPickup}
+                  icon={<MapPin className="h-4 w-4" />}
+                />
+                <Button
+                  type="button"
+                  onClick={getCurrentLocation}
+                  className="px-3 bg-yellow-500 hover:bg-yellow-600 text-black"
+                >
+                  <Navigation className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
             
             <div className="space-y-2">
@@ -54,14 +97,21 @@ const SearchForm = ({ onSearch }: SearchFormProps) => {
                 <MapPin className="h-4 w-4 text-yellow-500" />
                 Destination
               </label>
-              <Input
-                type="text"
-                placeholder="Enter destination address"
-                value={formData.destination}
-                onChange={(e) => setFormData({ ...formData, destination: e.target.value })}
-                className="h-12 text-lg border-2 border-yellow-500 focus:border-yellow-400 transition-colors bg-black text-white placeholder:text-gray-400"
-                required
-              />
+              <div className="flex gap-2">
+                <LocationSearch
+                  placeholder="Enter destination address"
+                  value={destination?.address || ''}
+                  onChange={setDestination}
+                  icon={<MapPin className="h-4 w-4" />}
+                />
+                <Button
+                  type="button"
+                  onClick={swapLocations}
+                  className="px-3 bg-yellow-500 hover:bg-yellow-600 text-black"
+                >
+                  <ArrowUpDown className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </div>
 
@@ -73,8 +123,8 @@ const SearchForm = ({ onSearch }: SearchFormProps) => {
               </label>
               <Input
                 type="date"
-                value={formData.date}
-                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
                 className="h-12 text-lg border-2 border-yellow-500 focus:border-yellow-400 transition-colors bg-black text-white"
                 required
               />
@@ -87,8 +137,8 @@ const SearchForm = ({ onSearch }: SearchFormProps) => {
               </label>
               <Input
                 type="time"
-                value={formData.time}
-                onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                value={time}
+                onChange={(e) => setTime(e.target.value)}
                 className="h-12 text-lg border-2 border-yellow-500 focus:border-yellow-400 transition-colors bg-black text-white"
                 required
               />

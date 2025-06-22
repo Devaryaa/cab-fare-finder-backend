@@ -35,24 +35,91 @@ const Index = () => {
   const handleSearch = async (searchData: SearchData) => {
     setIsLoading(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      setSearchResults(mockCabServices);
+    try {
+      // Calculate route using Google Maps
+      const { calculateRoute } = await import('../lib/googleMaps');
+      const { FareCalculator } = await import('../lib/fareCalculation');
+      
+      const route = await calculateRoute(searchData.pickup, searchData.destination);
+      
+      // Get real fares from all services including Namma Yatri API
+      const allFares = await FareCalculator.calculateAllFares(route, searchData.pickup, searchData.destination);
+      
+      // Convert to CabService format for existing components
+      const cabServices = allFares.map((fare, index) => ({
+        id: `${fare.serviceId}-${index}`,
+        name: fare.serviceName,
+        logo: `/logos/${fare.serviceId}.png`,
+        price: Math.round(fare.fare.total),
+        originalPrice: fare.fare.total > 50 ? Math.round(fare.fare.total * 1.1) : undefined,
+        rating: fare.serviceId === 'namma-yatri' ? 4.2 : fare.serviceId === 'ola' ? 4.1 : 4.3,
+        reviews: fare.serviceId === 'namma-yatri' ? 15000 : fare.serviceId === 'ola' ? 25000 : 30000,
+        estimatedTime: fare.estimatedTime,
+        capacity: fare.vehicleType.includes('AUTO') ? 3 : 4,
+        features: fare.features,
+        isRecommended: fare.serviceId === 'namma-yatri',
+        carType: fare.vehicleType,
+        estimateId: fare.estimateId,
+        searchId: fare.searchId,
+        serviceData: fare
+      }));
+      
+      setSearchResults(cabServices);
       setHasSearched(true);
-      setIsLoading(false);
+      
       toast({
-        title: "Search Complete!",
-        description: `Found ${mockCabServices.length} available rides for your trip.`,
+        title: "Real-time Prices Found!",
+        description: `Found ${cabServices.length} rides from ${searchData.pickup.address.split(',')[0]} to ${searchData.destination.address.split(',')[0]}`,
       });
-    }, 1500);
+      
+    } catch (error) {
+      console.error('Search error:', error);
+      toast({
+        title: "Search Failed",
+        description: "Unable to get live pricing. Please check your locations and try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleSelectService = (service: CabService) => {
-    toast({
-      title: "Booking Redirect",
-      description: `Redirecting to ${service.name} booking page...`,
-    });
-    console.log('Selected service:', service);
+  const handleSelectService = async (service: CabService) => {
+    try {
+      const { redirectToApp } = await import('../lib/fareCalculation');
+      const { nammaYatriAPI } = await import('../lib/nammaYatriApi');
+      
+      // Handle Namma Yatri API booking
+      if (service.serviceData?.serviceId === 'namma-yatri' && service.estimateId && service.searchId) {
+        await nammaYatriAPI.bookRide(service.estimateId, service.searchId);
+        toast({
+          title: "Opening Namma Yatri",
+          description: "Redirecting to Namma Yatri app for booking...",
+        });
+        return;
+      }
+      
+      // Handle Ola and Uber redirects
+      const pickup = localStorage.getItem('lastPickup') || '';
+      const destination = localStorage.getItem('lastDestination') || '';
+      
+      if (service.serviceData) {
+        redirectToApp(service.serviceData, pickup, destination);
+      }
+      
+      toast({
+        title: `Opening ${service.name}`,
+        description: `Redirecting to ${service.name} app for booking...`,
+      });
+      
+    } catch (error) {
+      console.error('Booking error:', error);
+      toast({
+        title: "Booking Failed",
+        description: "Unable to open booking app. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   // Show login page if not logged in
