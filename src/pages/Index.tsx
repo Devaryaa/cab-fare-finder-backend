@@ -3,14 +3,32 @@ import React, { useState } from 'react';
 import { Car, Zap, Shield, Clock } from 'lucide-react';
 import SearchForm, { SearchData } from '../components/SearchForm';
 import PriceComparison from '../components/PriceComparison';
+import Login from '../components/Login';
+import PointsBar from '../components/PointsBar';
 import { CabService } from '../components/CabServiceCard';
 import { mockCabServices } from '../data/mockServices';
 import { toast } from '@/hooks/use-toast';
 
+interface UserData {
+  email: string;
+  points: number;
+}
+
 const Index = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userData, setUserData] = useState<UserData | null>(null);
   const [searchResults, setSearchResults] = useState<CabService[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+
+  const handleLogin = (user: UserData) => {
+    setUserData(user);
+    setIsLoggedIn(true);
+    toast({
+      title: "Welcome to Fairfare!",
+      description: `Logged in successfully. You have ${user.points} points!`,
+    });
+  };
 
   const handleSearch = async (searchData: SearchData) => {
     setIsLoading(true);
@@ -35,8 +53,18 @@ const Index = () => {
     console.log('Selected service:', service);
   };
 
+  // Show login page if not logged in
+  if (!isLoggedIn) {
+    return <Login onLogin={handleLogin} />;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black">
+      {/* Points Bar */}
+      {userData && (
+        <PointsBar points={userData.points} userEmail={userData.email} />
+      )}
+
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/10 to-yellow-600/10"></div>
