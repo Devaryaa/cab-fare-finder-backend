@@ -46,20 +46,32 @@ const Index = () => {
       
       const route = calculateRoute(searchData.pickup, searchData.destination);
       
-      // Get fares from all services
-      const olafares = FareCalculator.calculateOlaFare({
-        distance: route.distance * 1000, // Convert to meters
-        duration: route.duration * 60, // Convert to seconds
-        distanceText: route.distanceText,
-        durationText: route.durationText
-      });
+      // Get fares from all services with error handling
+      let olafares, uberFares;
       
-      const uberFares = FareCalculator.calculateUberFare({
-        distance: route.distance * 1000,
-        duration: route.duration * 60,
-        distanceText: route.distanceText,
-        durationText: route.durationText
-      });
+      try {
+        olafares = FareCalculator.calculateOlaFare({
+          distance: route.distance * 1000, // Convert to meters
+          duration: route.duration * 60, // Convert to seconds
+          distanceText: route.distanceText,
+          durationText: route.durationText
+        });
+      } catch (error) {
+        console.error('Ola fare calculation error:', error);
+        throw new Error('Unable to calculate Ola fares');
+      }
+      
+      try {
+        uberFares = FareCalculator.calculateUberFare({
+          distance: route.distance * 1000,
+          duration: route.duration * 60,
+          distanceText: route.distanceText,
+          durationText: route.durationText
+        });
+      } catch (error) {
+        console.error('Uber fare calculation error:', error);
+        throw new Error('Unable to calculate Uber fares');
+      }
       
       // Try to get real Namma Yatri fares
       let nammaYatriFares = [];

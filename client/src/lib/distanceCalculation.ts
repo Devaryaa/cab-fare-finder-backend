@@ -24,7 +24,18 @@ export interface RouteInfo {
 }
 
 export function calculateRoute(pickup: { lat: number; lng: number }, destination: { lat: number; lng: number }): RouteInfo {
+  // Validate coordinates
+  if (!pickup.lat || !pickup.lng || !destination.lat || !destination.lng) {
+    throw new Error('Invalid coordinates provided');
+  }
+  
   const distance = calculateDistance(pickup.lat, pickup.lng, destination.lat, destination.lng);
+  
+  // Validate distance calculation
+  if (isNaN(distance) || distance <= 0) {
+    throw new Error('Unable to calculate distance between locations');
+  }
+  
   const duration = estimateTravelTime(distance);
   
   return {

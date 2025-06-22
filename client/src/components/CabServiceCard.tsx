@@ -58,9 +58,9 @@ const CabServiceCard = ({ service, onSelect }: CabServiceCardProps) => {
           <div className="text-right">
             <div className="flex items-center space-x-1">
               {service.originalPrice && (
-                <span className="text-sm text-gray-500 line-through">${service.originalPrice}</span>
+                <span className="text-sm text-gray-500 line-through">₹{service.originalPrice}</span>
               )}
-              <span className="text-2xl font-bold text-yellow-500">${service.price}</span>
+              <span className="text-2xl font-bold text-yellow-500">₹{service.price}</span>
             </div>
             {discount > 0 && (
               <Badge variant="destructive" className="text-xs bg-yellow-500 text-black">
