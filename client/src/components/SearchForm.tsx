@@ -27,8 +27,57 @@ export interface SearchData {
 const SearchForm = ({ onSearch }: SearchFormProps) => {
   const [pickup, setPickup] = useState<LocationData | null>(null);
   const [destination, setDestination] = useState<LocationData | null>(null);
-  const [date, setDate] = useState('');
-  const [time, setTime] = useState('');
+  const [date, setDate] = useState(() => {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+  });
+  const [time, setTime] = useState(() => {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() + 15); // Add 15 minutes for minimum booking time
+    return now.toTimeString().slice(0, 5);
+  });
+
+  // Get minimum date (today)
+  const getMinDate = () => {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+  };
+
+  // Get maximum date (30 days from today)
+  const getMaxDate = () => {
+    const future = new Date();
+    future.setDate(future.getDate() + 30);
+    return future.toISOString().split('T')[0];
+  };
+
+  // Validate time for today's date
+  const getMinTime = () => {
+    const today = new Date();
+    const selectedDate = new Date(date);
+    
+    // If selected date is today, minimum time is current time + 15 minutes
+    if (selectedDate.toDateString() === today.toDateString()) {
+      const futureTime = new Date(today.getTime() + 15 * 60000); // Add 15 minutes
+      return futureTime.toTimeString().slice(0, 5);
+    }
+    return "00:00";
+  };
+
+  // Handle date change and validate time
+  const handleDateChange = (newDate: string) => {
+    setDate(newDate);
+    
+    // If changing to today and current time is invalid, update time
+    const today = new Date();
+    const selectedDate = new Date(newDate);
+    
+    if (selectedDate.toDateString() === today.toDateString()) {
+      const minTime = getMinTime();
+      if (time < minTime) {
+        setTime(minTime);
+      }
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -130,7 +179,9 @@ const SearchForm = ({ onSearch }: SearchFormProps) => {
               <Input
                 type="date"
                 value={date}
-                onChange={(e) => setDate(e.target.value)}
+                onChange={(e) => handleDateChange(e.target.value)}
+                min={getMinDate()}
+                max={getMaxDate()}
                 className="h-12 text-lg border-2 border-yellow-500 focus:border-yellow-400 transition-colors bg-black text-white"
                 required
               />
@@ -145,6 +196,7 @@ const SearchForm = ({ onSearch }: SearchFormProps) => {
                 type="time"
                 value={time}
                 onChange={(e) => setTime(e.target.value)}
+                min={getMinTime()}
                 className="h-12 text-lg border-2 border-yellow-500 focus:border-yellow-400 transition-colors bg-black text-white"
                 required
               />

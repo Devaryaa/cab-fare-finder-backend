@@ -11,8 +11,8 @@ export interface CabService {
   logo: string;
   price: number;
   originalPrice?: number;
-  rating: number;
-  reviews: number;
+  rating?: number;
+  reviews?: number;
   estimatedTime: string;
   capacity: number;
   features: string[];
@@ -71,11 +71,15 @@ const CabServiceCard = ({ service, onSelect }: CabServiceCardProps) => {
         </div>
 
         <div className="flex items-center justify-between mb-4 text-sm text-gray-300">
-          <div className="flex items-center space-x-1">
-            <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
-            <span className="font-medium">{service.rating}</span>
-            <span>({service.reviews} reviews)</span>
-          </div>
+          {service.rating && service.reviews ? (
+            <div className="flex items-center space-x-1">
+              <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
+              <span className="font-medium">{service.rating}</span>
+              <span>({service.reviews} reviews)</span>
+            </div>
+          ) : (
+            <div className="text-yellow-500 text-sm">Real-time pricing</div>
+          )}
           
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-1">

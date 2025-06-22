@@ -91,15 +91,15 @@ const Index = () => {
       
       const allFares = [olafares, uberFares, ...nammaYatriFares];
       
-      // Convert to CabService format
+      // Convert to CabService format with real data only
       const cabServices = allFares.map((fare, index) => ({
         id: `${fare.serviceId}-${index}`,
         name: fare.serviceName,
         logo: `/logos/${fare.serviceId}.png`,
         price: Math.round(fare.fare.total),
-        originalPrice: fare.fare.total > 50 ? Math.round(fare.fare.total * 1.1) : undefined,
-        rating: fare.serviceId === 'namma-yatri' ? 4.2 : fare.serviceId === 'ola' ? 4.1 : 4.3,
-        reviews: fare.serviceId === 'namma-yatri' ? 15000 : fare.serviceId === 'ola' ? 25000 : 30000,
+        originalPrice: undefined, // Remove fake original prices
+        rating: undefined, // Remove fake ratings
+        reviews: undefined, // Remove fake reviews
         estimatedTime: fare.estimatedTime,
         capacity: fare.vehicleType.includes('AUTO') || fare.vehicleType.includes('Auto') ? 3 : 4,
         features: fare.features,
