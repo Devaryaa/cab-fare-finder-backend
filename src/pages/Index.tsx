@@ -36,23 +36,23 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black">
       {/* Hero Section */}
       <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/10 to-yellow-600/10"></div>
         <div className="relative container mx-auto px-4 py-16">
           <div className="text-center mb-12">
             <div className="flex justify-center mb-6">
-              <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-4 rounded-2xl">
-                <Car className="h-12 w-12 text-white" />
+              <div className="bg-gradient-to-r from-yellow-400 to-yellow-500 p-4 rounded-2xl">
+                <Car className="h-12 w-12 text-black" />
               </div>
             </div>
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-              Compare <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Cab Prices</span>
+            <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
+              Compare <span className="bg-gradient-to-r from-yellow-400 to-yellow-500 bg-clip-text text-transparent">Cab Prices</span>
               <br />
               in Seconds
             </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
               Find the best deals on rides from all major cab services. Save time and money with our instant price comparison.
             </p>
           </div>
@@ -66,27 +66,27 @@ const Index = () => {
           {!hasSearched && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
               <div className="text-center">
-                <div className="bg-green-100 p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                  <Zap className="h-8 w-8 text-green-600" />
+                <div className="bg-yellow-400 p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                  <Zap className="h-8 w-8 text-black" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Instant Results</h3>
-                <p className="text-gray-600">Get real-time prices from all major cab services in one search.</p>
+                <h3 className="text-xl font-semibold text-white mb-2">Instant Results</h3>
+                <p className="text-gray-300">Get real-time prices from all major cab services in one search.</p>
               </div>
               
               <div className="text-center">
-                <div className="bg-blue-100 p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                  <Shield className="h-8 w-8 text-blue-600" />
+                <div className="bg-yellow-400 p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                  <Shield className="h-8 w-8 text-black" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Best Prices</h3>
-                <p className="text-gray-600">Compare prices and find the most affordable option for your trip.</p>
+                <h3 className="text-xl font-semibold text-white mb-2">Best Prices</h3>
+                <p className="text-gray-300">Compare prices and find the most affordable option for your trip.</p>
               </div>
               
               <div className="text-center">
-                <div className="bg-purple-100 p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                  <Clock className="h-8 w-8 text-purple-600" />
+                <div className="bg-yellow-400 p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                  <Clock className="h-8 w-8 text-black" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Save Time</h3>
-                <p className="text-gray-600">No need to check multiple apps. We do the comparison for you.</p>
+                <h3 className="text-xl font-semibold text-white mb-2">Save Time</h3>
+                <p className="text-gray-300">No need to check multiple apps. We do the comparison for you.</p>
               </div>
             </div>
           )}
@@ -97,9 +97,9 @@ const Index = () => {
       {isLoading && (
         <div className="container mx-auto px-4 py-16">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent mx-auto mb-4"></div>
-            <h2 className="text-2xl font-semibold text-gray-900 mb-2">Searching for the best rides...</h2>
-            <p className="text-gray-600">Comparing prices from all available services</p>
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-yellow-400 border-t-transparent mx-auto mb-4"></div>
+            <h2 className="text-2xl font-semibold text-white mb-2">Searching for the best rides...</h2>
+            <p className="text-gray-300">Comparing prices from all available services</p>
           </div>
         </div>
       )}
