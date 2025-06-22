@@ -5,9 +5,10 @@ import SearchForm, { SearchData } from '../components/SearchForm';
 import PriceComparison from '../components/PriceComparison';
 import Login from '../components/Login';
 import PointsBar from '../components/PointsBar';
+import Rewards from './Rewards';
 import { CabService } from '../components/CabServiceCard';
-import { mockCabServices } from '../data/mockServices';
 import { toast } from '@/hooks/use-toast';
+import { apiRequest } from '@/lib/queryClient';
 
 interface UserData {
   id: number;
@@ -22,6 +23,8 @@ const Index = () => {
   const [searchResults, setSearchResults] = useState<CabService[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const [showRewards, setShowRewards] = useState(false);
+  const [lastSearchData, setLastSearchData] = useState<SearchData | null>(null);
 
   const handleLogin = (user: UserData) => {
     setUserData(user);
@@ -46,6 +49,7 @@ const Index = () => {
 
   const handleSearch = async (searchData: SearchData) => {
     setIsLoading(true);
+    setLastSearchData(searchData);
     
     try {
       // Store locations for booking redirects
@@ -151,38 +155,86 @@ const Index = () => {
   const handleSelectService = async (service: CabService) => {
     try {
       const { redirectToApp } = await import('../lib/fareCalculation');
-      const { nammaYatriAPI } = await import('../lib/nammaYatriApi');
       
-      // Handle Namma Yatri API booking
-      if (service.serviceData?.serviceId === 'namma-yatri' && service.estimateId && service.searchId) {
-        await nammaYatriAPI.bookRide(service.estimateId, service.searchId);
-        toast({
-          title: "Opening Namma Yatri",
-          description: "Redirecting to Namma Yatri app for booking...",
-        });
-        return;
+      // Calculate distance and award points
+      if (userData && lastSearchData) {
+        const { calculateRoute } = await import('../lib/distanceCalculation');
+        const route = calculateRoute(lastSearchData.pickup, lastSearchData.destination);
+        const pointsEarned = Math.floor(route.distance / 3);
+        
+        // Create booking record
+        try {
+          await apiRequest('/api/bookings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userId: userData.id,
+              serviceId: service.serviceData?.serviceId || service.name.toLowerCase().replace(' ', '-'),
+              serviceName: service.name,
+              pickupAddress: lastSearchData.pickup.address,
+              destinationAddress: lastSearchData.destination.address,
+              distance: route.distance,
+              fare: service.price
+            })
+          });
+          
+          // Update user points locally
+          const newPoints = userData.points + pointsEarned;
+          setUserData({ ...userData, points: newPoints });
+          
+          toast({
+            title: "Booking Confirmed!",
+            description: `${service.name} booked! You earned ${pointsEarned} points for ${route.distanceText}`,
+          });
+          
+        } catch (bookingError) {
+          console.error('Booking record error:', bookingError);
+        }
       }
       
-      // Handle Ola and Uber redirects
+      // Redirect to app
       const pickup = localStorage.getItem('lastPickup') || '';
       const destination = localStorage.getItem('lastDestination') || '';
       
       if (service.serviceData) {
         redirectToApp(service.serviceData, pickup, destination);
+      } else {
+        // Generic redirect based on service name
+        const serviceName = service.name.toLowerCase();
+        let redirectUrl = '';
+        
+        if (serviceName.includes('ola')) {
+          redirectUrl = `https://book.olacabs.com/?pickup=${encodeURIComponent(pickup)}&drop=${encodeURIComponent(destination)}`;
+        } else if (serviceName.includes('uber')) {
+          redirectUrl = `https://m.uber.com/looking?pickup_nickname=${encodeURIComponent(pickup)}&dropoff_nickname=${encodeURIComponent(destination)}`;
+        } else {
+          redirectUrl = 'https://nammayatri.in/open?source=fairfare';
+        }
+        
+        window.open(redirectUrl, '_blank');
       }
-      
-      toast({
-        title: `Opening ${service.name}`,
-        description: `Redirecting to ${service.name} app for booking...`,
-      });
       
     } catch (error) {
       console.error('Booking error:', error);
       toast({
         title: "Booking Failed",
-        description: "Unable to open booking app. Please try again.",
+        description: "Unable to process booking. Please try again.",
         variant: "destructive",
       });
+    }
+  };
+
+  const handleRewardsClick = () => {
+    setShowRewards(true);
+  };
+
+  const handleBackFromRewards = () => {
+    setShowRewards(false);
+  };
+
+  const handlePointsUpdate = (newPoints: number) => {
+    if (userData) {
+      setUserData({ ...userData, points: newPoints });
     }
   };
 
@@ -191,11 +243,28 @@ const Index = () => {
     return <Login onLogin={handleLogin} />;
   }
 
+  // Show rewards page if requested
+  if (showRewards && userData) {
+    return (
+      <Rewards
+        userId={userData.id}
+        userPoints={userData.points}
+        onBack={handleBackFromRewards}
+        onPointsUpdate={handlePointsUpdate}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black">
       {/* Points Bar */}
       {userData && (
-        <PointsBar points={userData.points} username={userData.username} onLogout={handleLogout} />
+        <PointsBar 
+          points={userData.points} 
+          username={userData.username} 
+          onLogout={handleLogout}
+          onRewardsClick={handleRewardsClick}
+        />
       )}
 
       {/* Hero Section */}

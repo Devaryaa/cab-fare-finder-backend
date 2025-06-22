@@ -6,9 +6,10 @@ interface PointsBarProps {
   points: number;
   username: string;
   onLogout: () => void;
+  onRewardsClick: () => void;
 }
 
-const PointsBar = ({ points, username, onLogout }: PointsBarProps) => {
+const PointsBar = ({ points, username, onLogout, onRewardsClick }: PointsBarProps) => {
   return (
     <div className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-black py-3 px-4">
       <div className="container mx-auto flex items-center justify-between">
@@ -25,10 +26,15 @@ const PointsBar = ({ points, username, onLogout }: PointsBarProps) => {
         </div>
         
         <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2">
-            <Gift className="h-4 w-4" />
+          <Button
+            onClick={onRewardsClick}
+            variant="ghost"
+            size="sm"
+            className="text-black hover:bg-black hover:text-yellow-500 transition-colors"
+          >
+            <Gift className="h-4 w-4 mr-2" />
             <span className="text-sm font-medium">Redeem Rewards</span>
-          </div>
+          </Button>
           <Button
             onClick={onLogout}
             variant="ghost"
