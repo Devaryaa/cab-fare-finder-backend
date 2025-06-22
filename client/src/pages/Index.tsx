@@ -32,6 +32,18 @@ const Index = () => {
     });
   };
 
+  const handleLogout = () => {
+    setUserData(null);
+    setIsLoggedIn(false);
+    setSearchResults([]);
+    setHasSearched(false);
+    
+    toast({
+      title: "Logged Out",
+      description: "You have been successfully logged out.",
+    });
+  };
+
   const handleSearch = async (searchData: SearchData) => {
     setIsLoading(true);
     
@@ -183,7 +195,7 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black">
       {/* Points Bar */}
       {userData && (
-        <PointsBar points={userData.points} username={userData.username} />
+        <PointsBar points={userData.points} username={userData.username} onLogout={handleLogout} />
       )}
 
       {/* Hero Section */}
