@@ -39,16 +39,16 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black">
       {/* Hero Section */}
       <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/10 to-yellow-600/10"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/10 to-yellow-600/10"></div>
         <div className="relative container mx-auto px-4 py-16">
           <div className="text-center mb-12">
             <div className="flex justify-center mb-6">
-              <div className="bg-gradient-to-r from-yellow-400 to-yellow-500 p-4 rounded-2xl">
+              <div className="bg-gradient-to-r from-yellow-500 to-yellow-600 p-4 rounded-2xl">
                 <Car className="h-12 w-12 text-black" />
               </div>
             </div>
             <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
-              Compare <span className="bg-gradient-to-r from-yellow-400 to-yellow-500 bg-clip-text text-transparent">Cab Prices</span>
+              Compare <span className="bg-gradient-to-r from-yellow-500 to-yellow-600 bg-clip-text text-transparent">Cab Prices</span>
               <br />
               in Seconds
             </h1>
@@ -66,7 +66,7 @@ const Index = () => {
           {!hasSearched && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
               <div className="text-center">
-                <div className="bg-yellow-400 p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                <div className="bg-yellow-500 p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
                   <Zap className="h-8 w-8 text-black" />
                 </div>
                 <h3 className="text-xl font-semibold text-white mb-2">Instant Results</h3>
@@ -74,7 +74,7 @@ const Index = () => {
               </div>
               
               <div className="text-center">
-                <div className="bg-yellow-400 p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                <div className="bg-yellow-500 p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
                   <Shield className="h-8 w-8 text-black" />
                 </div>
                 <h3 className="text-xl font-semibold text-white mb-2">Best Prices</h3>
@@ -82,7 +82,7 @@ const Index = () => {
               </div>
               
               <div className="text-center">
-                <div className="bg-yellow-400 p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                <div className="bg-yellow-500 p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
                   <Clock className="h-8 w-8 text-black" />
                 </div>
                 <h3 className="text-xl font-semibold text-white mb-2">Save Time</h3>
@@ -97,7 +97,7 @@ const Index = () => {
       {isLoading && (
         <div className="container mx-auto px-4 py-16">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-16 w-16 border-4 border-yellow-400 border-t-transparent mx-auto mb-4"></div>
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-yellow-500 border-t-transparent mx-auto mb-4"></div>
             <h2 className="text-2xl font-semibold text-white mb-2">Searching for the best rides...</h2>
             <p className="text-gray-300">Comparing prices from all available services</p>
           </div>
