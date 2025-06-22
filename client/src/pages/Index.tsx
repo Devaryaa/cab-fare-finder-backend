@@ -36,16 +36,60 @@ const Index = () => {
     setIsLoading(true);
     
     try {
-      // Calculate route using Google Maps
-      const { calculateRoute } = await import('../lib/googleMaps');
+      // Store locations for booking redirects
+      localStorage.setItem('lastPickup', searchData.pickup.address);
+      localStorage.setItem('lastDestination', searchData.destination.address);
+      
+      // Calculate route using distance formula
+      const { calculateRoute } = await import('../lib/distanceCalculation');
       const { FareCalculator } = await import('../lib/fareCalculation');
       
-      const route = await calculateRoute(searchData.pickup, searchData.destination);
+      const route = calculateRoute(searchData.pickup, searchData.destination);
       
-      // Get real fares from all services including Namma Yatri API
-      const allFares = await FareCalculator.calculateAllFares(route, searchData.pickup, searchData.destination);
+      // Get fares from all services
+      const olafares = FareCalculator.calculateOlaFare({
+        distance: route.distance * 1000, // Convert to meters
+        duration: route.duration * 60, // Convert to seconds
+        distanceText: route.distanceText,
+        durationText: route.durationText
+      });
       
-      // Convert to CabService format for existing components
+      const uberFares = FareCalculator.calculateUberFare({
+        distance: route.distance * 1000,
+        duration: route.duration * 60,
+        distanceText: route.distanceText,
+        durationText: route.durationText
+      });
+      
+      // Try to get real Namma Yatri fares
+      let nammaYatriFares = [];
+      try {
+        nammaYatriFares = await FareCalculator.getNammaYatriFares(searchData.pickup, searchData.destination);
+      } catch (error) {
+        console.log('Namma Yatri API unavailable, using estimated fares');
+        // Create estimated Namma Yatri fare
+        const estimatedNammaFare = {
+          serviceId: 'namma-yatri',
+          serviceName: 'Namma Yatri',
+          vehicleType: 'Auto',
+          fare: {
+            baseFare: 20,
+            distanceFare: route.distance * 10,
+            timeFare: 0,
+            surgeMultiplier: 1.0,
+            platformFee: Math.min(5, route.distance * 0.5),
+            taxes: 0,
+            total: 20 + (route.distance * 10) + Math.min(5, route.distance * 0.5)
+          },
+          estimatedTime: route.durationText,
+          features: ['Open Source', 'No Surge Pricing', 'Driver Friendly']
+        };
+        nammaYatriFares = [estimatedNammaFare];
+      }
+      
+      const allFares = [olafares, uberFares, ...nammaYatriFares];
+      
+      // Convert to CabService format
       const cabServices = allFares.map((fare, index) => ({
         id: `${fare.serviceId}-${index}`,
         name: fare.serviceName,
@@ -55,28 +99,28 @@ const Index = () => {
         rating: fare.serviceId === 'namma-yatri' ? 4.2 : fare.serviceId === 'ola' ? 4.1 : 4.3,
         reviews: fare.serviceId === 'namma-yatri' ? 15000 : fare.serviceId === 'ola' ? 25000 : 30000,
         estimatedTime: fare.estimatedTime,
-        capacity: fare.vehicleType.includes('AUTO') ? 3 : 4,
+        capacity: fare.vehicleType.includes('AUTO') || fare.vehicleType.includes('Auto') ? 3 : 4,
         features: fare.features,
         isRecommended: fare.serviceId === 'namma-yatri',
         carType: fare.vehicleType,
         estimateId: fare.estimateId,
         searchId: fare.searchId,
         serviceData: fare
-      }));
+      })).sort((a, b) => a.price - b.price);
       
       setSearchResults(cabServices);
       setHasSearched(true);
       
       toast({
-        title: "Real-time Prices Found!",
-        description: `Found ${cabServices.length} rides from ${searchData.pickup.address.split(',')[0]} to ${searchData.destination.address.split(',')[0]}`,
+        title: "Fare Comparison Ready!",
+        description: `${route.distanceText} trip from ${searchData.pickup.address.split(',')[0]} to ${searchData.destination.address.split(',')[0]}`,
       });
       
     } catch (error) {
       console.error('Search error:', error);
       toast({
         title: "Search Failed",
-        description: "Unable to get live pricing. Please check your locations and try again.",
+        description: "Unable to calculate fares. Please check your locations and try again.",
         variant: "destructive",
       });
     } finally {

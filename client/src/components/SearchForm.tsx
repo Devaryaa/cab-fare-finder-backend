@@ -4,8 +4,14 @@ import { MapPin, Calendar, Clock, Search, ArrowUpDown, Navigation } from 'lucide
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
-import LocationSearch from './LocationSearch';
-import { LocationData } from '@/lib/googleMaps';
+import SimpleLocationSearch from './SimpleLocationSearch';
+
+interface LocationData {
+  address: string;
+  lat: number;
+  lng: number;
+  placeId: string;
+}
 
 interface SearchFormProps {
   onSearch: (data: SearchData) => void;
@@ -76,7 +82,7 @@ const SearchForm = ({ onSearch }: SearchFormProps) => {
                 Pickup Location
               </label>
               <div className="flex gap-2">
-                <LocationSearch
+                <SimpleLocationSearch
                   placeholder="Enter pickup address"
                   value={pickup?.address || ''}
                   onChange={setPickup}
@@ -98,7 +104,7 @@ const SearchForm = ({ onSearch }: SearchFormProps) => {
                 Destination
               </label>
               <div className="flex gap-2">
-                <LocationSearch
+                <SimpleLocationSearch
                   placeholder="Enter destination address"
                   value={destination?.address || ''}
                   onChange={setDestination}
