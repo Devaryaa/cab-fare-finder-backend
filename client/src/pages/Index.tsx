@@ -10,7 +10,9 @@ import { mockCabServices } from '../data/mockServices';
 import { toast } from '@/hooks/use-toast';
 
 interface UserData {
+  id: number;
   email: string;
+  username: string;
   points: number;
 }
 
@@ -25,7 +27,7 @@ const Index = () => {
     setUserData(user);
     setIsLoggedIn(true);
     toast({
-      title: "Welcome to Fairfare!",
+      title: `Welcome to Fairfare, ${user.username}!`,
       description: `Logged in successfully. You have ${user.points} points!`,
     });
   };
@@ -62,7 +64,7 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black">
       {/* Points Bar */}
       {userData && (
-        <PointsBar points={userData.points} userEmail={userData.email} />
+        <PointsBar points={userData.points} username={userData.username} />
       )}
 
       {/* Hero Section */}

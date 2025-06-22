@@ -1,13 +1,12 @@
 
-import React from 'react';
 import { Star, Gift } from 'lucide-react';
 
 interface PointsBarProps {
   points: number;
-  userEmail: string;
+  username: string;
 }
 
-const PointsBar = ({ points, userEmail }: PointsBarProps) => {
+const PointsBar = ({ points, username }: PointsBarProps) => {
   return (
     <div className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-black py-3 px-4">
       <div className="container mx-auto flex items-center justify-between">
@@ -19,7 +18,7 @@ const PointsBar = ({ points, userEmail }: PointsBarProps) => {
             <span className="font-semibold">{points.toLocaleString()} Points</span>
           </div>
           <div className="hidden md:block text-sm opacity-80">
-            Welcome back, {userEmail.split('@')[0]}!
+            Welcome back, {username}!
           </div>
         </div>
         
