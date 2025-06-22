@@ -30,11 +30,11 @@ const CabServiceCard = ({ service, onSelect }: CabServiceCardProps) => {
     Math.round(((service.originalPrice - service.price) / service.originalPrice) * 100) : 0;
 
   return (
-    <Card className={`relative overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 ${
-      service.isRecommended ? 'ring-2 ring-green-500 ring-opacity-50' : ''
+    <Card className={`relative overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 bg-black border-yellow-400 ${
+      service.isRecommended ? 'ring-2 ring-yellow-400 ring-opacity-50' : ''
     }`}>
       {service.isRecommended && (
-        <div className="absolute top-0 right-0 bg-gradient-to-l from-green-500 to-green-400 text-white px-4 py-1 text-sm font-medium rounded-bl-lg">
+        <div className="absolute top-0 right-0 bg-gradient-to-l from-yellow-400 to-yellow-500 text-black px-4 py-1 text-sm font-medium rounded-bl-lg">
           <Zap className="inline h-3 w-3 mr-1" />
           Recommended
         </div>
@@ -43,12 +43,12 @@ const CabServiceCard = ({ service, onSelect }: CabServiceCardProps) => {
       <CardContent className="p-6">
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-2xl font-bold text-gray-700">
+            <div className="w-12 h-12 bg-yellow-400 rounded-lg flex items-center justify-center text-2xl font-bold text-black">
               {service.logo}
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">{service.name}</h3>
-              <p className="text-sm text-gray-600">{service.carType}</p>
+              <h3 className="text-lg font-semibold text-white">{service.name}</h3>
+              <p className="text-sm text-yellow-400">{service.carType}</p>
             </div>
           </div>
           
@@ -57,17 +57,17 @@ const CabServiceCard = ({ service, onSelect }: CabServiceCardProps) => {
               {service.originalPrice && (
                 <span className="text-sm text-gray-500 line-through">${service.originalPrice}</span>
               )}
-              <span className="text-2xl font-bold text-gray-900">${service.price}</span>
+              <span className="text-2xl font-bold text-yellow-400">${service.price}</span>
             </div>
             {discount > 0 && (
-              <Badge variant="destructive" className="text-xs">
+              <Badge variant="destructive" className="text-xs bg-yellow-400 text-black">
                 {discount}% OFF
               </Badge>
             )}
           </div>
         </div>
 
-        <div className="flex items-center justify-between mb-4 text-sm text-gray-600">
+        <div className="flex items-center justify-between mb-4 text-sm text-gray-300">
           <div className="flex items-center space-x-1">
             <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
             <span className="font-medium">{service.rating}</span>
@@ -76,11 +76,11 @@ const CabServiceCard = ({ service, onSelect }: CabServiceCardProps) => {
           
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-1">
-              <Clock className="h-4 w-4 text-blue-600" />
+              <Clock className="h-4 w-4 text-yellow-400" />
               <span>{service.estimatedTime}</span>
             </div>
             <div className="flex items-center space-x-1">
-              <Users className="h-4 w-4 text-green-600" />
+              <Users className="h-4 w-4 text-yellow-400" />
               <span>{service.capacity} seats</span>
             </div>
           </div>
@@ -88,7 +88,7 @@ const CabServiceCard = ({ service, onSelect }: CabServiceCardProps) => {
 
         <div className="flex flex-wrap gap-2 mb-4">
           {service.features.map((feature, index) => (
-            <Badge key={index} variant="secondary" className="text-xs">
+            <Badge key={index} variant="secondary" className="text-xs bg-yellow-400/20 text-yellow-400 border-yellow-400">
               {feature}
             </Badge>
           ))}
@@ -96,7 +96,7 @@ const CabServiceCard = ({ service, onSelect }: CabServiceCardProps) => {
 
         <Button
           onClick={() => onSelect(service)}
-          className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 transition-all duration-300"
+          className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-black transition-all duration-300 font-semibold"
         >
           Book Now
         </Button>
