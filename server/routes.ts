@@ -1,6 +1,6 @@
 import type { Express, Request, Response } from "express";
-import { storage } from "./storage";
-import { insertUserSchema, insertBookingSchema, insertRedemptionSchema } from "@shared/schema";
+import { storage } from "./storage.js";
+import { insertUserSchema, insertBookingSchema, insertRedemptionSchema } from "../shared/schema.js";
 import { z } from "zod";
 
 const loginSchema = z.object({
@@ -27,7 +27,8 @@ export async function registerRoutes(app: Express): Promise<void> {
     try {
       const { email, password } = loginSchema.parse(req.body);
       const user = await storage.getUserByEmail(email);
-      if (!user || user.password !== password) return res.status(401).json({ message: "Invalid credentials" });
+      if (!user || user.password !== password)
+        return res.status(401).json({ message: "Invalid credentials" });
 
       res.json({ id: user.id, username: user.username, email: user.email, points: user.points });
     } catch {
@@ -35,7 +36,7 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
-  app.get("/api/user/:id", async (req: Request<{ id: string }>, res: Response) => {
+  app.get("/api/user/:id", async (req: Request, res: Response) => {
     try {
       const id = z.coerce.number().parse(req.params.id);
       const user = await storage.getUser(id);
@@ -47,7 +48,7 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
-  app.patch("/api/user/:id/points", async (req: Request<{ id: string }>, res: Response) => {
+  app.patch("/api/user/:id/points", async (req: Request, res: Response) => {
     try {
       const id = z.coerce.number().parse(req.params.id);
       const { points } = z.object({ points: z.number() }).parse(req.body);
@@ -77,7 +78,7 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
-  app.get("/api/bookings/:userId", async (req: Request<{ userId: string }>, res: Response) => {
+  app.get("/api/bookings/:userId", async (req: Request, res: Response) => {
     try {
       const userId = z.coerce.number().parse(req.params.userId);
       const bookings = await storage.getUserBookings(userId);
@@ -112,7 +113,7 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
-  app.get("/api/redemptions/:userId", async (req: Request<{ userId: string }>, res: Response) => {
+  app.get("/api/redemptions/:userId", async (req: Request, res: Response) => {
     try {
       const userId = z.coerce.number().parse(req.params.userId);
       const redemptions = await storage.getUserRedemptions(userId);
