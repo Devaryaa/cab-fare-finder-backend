@@ -1,4 +1,4 @@
-import express, { type Request, Response, NextFunction } from "express";
+import express, { Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { seedRewards } from "./seedRewards";
@@ -7,15 +7,15 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.use((req, res, next) => {
+app.use((req: Request, res: Response, next: NextFunction) => {
   const start = Date.now();
   const path = req.path;
   let capturedJsonResponse: Record<string, any> | undefined = undefined;
 
-  const originalResJson = res.json;
-  res.json = function (bodyJson, ...args) {
+  const originalResJson = res.json.bind(res);
+  res.json = function (bodyJson: any, ...args: any[]) {
     capturedJsonResponse = bodyJson;
-    return originalResJson.apply(res, [bodyJson, ...args]);
+    return originalResJson(bodyJson, ...args);
   };
 
   res.on("finish", () => {
@@ -37,7 +37,7 @@ app.use((req, res, next) => {
   next();
 });
 
-const USE_SERVE_STATIC = false; // set to true ONLY if frontend is in this project
+const USE_SERVE_STATIC = false; // Change to true if frontend is bundled here
 
 (async () => {
   const server = await registerRoutes(app);
@@ -48,21 +48,23 @@ const USE_SERVE_STATIC = false; // set to true ONLY if frontend is in this proje
 
     res.status(status).json({ message });
     throw err;
-  }); // ✅ Fixed here
+  });
 
-  // Only use Vite in local development
   if (app.get("env") === "development") {
     await setupVite(app, server);
   } else if (USE_SERVE_STATIC) {
     serveStatic(app);
   }
 
-  const port = process.env.PORT || 5000;
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
-    log(`✅ Server running on http://0.0.0.0:${port}`);
-  });
-})(); // ✅ Correctly closed the async IIFE here
+  const port = process.env.PORT ? Number(process.env.PORT) : 5000;
+  server.listen(
+    {
+      port,
+      host: "0.0.0.0",
+      reusePort: true,
+    },
+    () => {
+      log(`✅ Server running on http://0.0.0.0:${port}`);
+    }
+  );
+})();
