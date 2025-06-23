@@ -1,7 +1,7 @@
 import express, { Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
-//import { setupVite, serveStatic, log } from "./vite";
-import { log } from "./log"
+// import { setupVite, serveStatic, log } from "./vite";
+// import { log } from "./log"; // ❌ Remove this line
 import { seedRewards } from "./seedRewards";
 
 const app = express();
@@ -31,14 +31,14 @@ app.use((req: Request, res: Response, next: NextFunction) => {
         logLine = logLine.slice(0, 79) + "…";
       }
 
-      log(logLine);
+      console.log(logLine); // ✅ Use console.log instead of log
     }
   });
 
   next();
 });
 
-const USE_SERVE_STATIC = false; // Change to true if frontend is bundled here
+const USE_SERVE_STATIC = false;
 
 (async () => {
   const server = await registerRoutes(app);
@@ -51,11 +51,11 @@ const USE_SERVE_STATIC = false; // Change to true if frontend is bundled here
     throw err;
   });
 
- // if (app.get("env") === "development") {
-//    await setupVite(app, server);
-//  } else if (USE_SERVE_STATIC) {
-//    serveStatic(app);
-//  }
+  // if (app.get("env") === "development") {
+  //   await setupVite(app, server);
+  // } else if (USE_SERVE_STATIC) {
+  //   serveStatic(app);
+  // }
 
   const port = process.env.PORT ? Number(process.env.PORT) : 5000;
   server.listen(
@@ -65,7 +65,7 @@ const USE_SERVE_STATIC = false; // Change to true if frontend is bundled here
       reusePort: true,
     },
     () => {
-      log(`✅ Server running on http://0.0.0.0:${port}`);
+      console.log(`✅ Server running on http://0.0.0.0:${port}`); // ✅ Also here
     }
   );
 })();
