@@ -36,7 +36,7 @@ app.use((req, res, next) => {
 
   next();
 });
-
+const USE_SERVE_STATIC = false; // set to true ONLY if frontend is in this project
 (async () => {
   const server = await registerRoutes(app);
 
@@ -47,6 +47,23 @@ app.use((req, res, next) => {
     res.status(status).json({ message });
     throw err;
   });
+
+  // Only use Vite in local development
+  if (app.get("env") === "development") {
+    await setupVite(app, server);
+  } else if (USE_SERVE_STATIC) {
+    serveStatic(app); // ❌ don't serve frontend when using separate frontend
+  }
+
+  const port = process.env.PORT || 5000;
+  server.listen({
+    port,
+    host: "0.0.0.0",
+    reusePort: true,
+  }, () => {
+    log(`✅ Server running on http://0.0.0.0:${port}`);
+  });
+})();
 
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route
