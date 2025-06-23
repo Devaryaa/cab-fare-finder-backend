@@ -8,8 +8,8 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "allowImportingTsExtensions": true, // Optional but helpful for ESM projects (if needed)
+    "verbatimModuleSyntax": true // Ensures import paths stay exactly as written (ESM-friendly)
   },
-  "include": ["**/*.ts"],
-  "exclude": ["dist"]
-}
+  "include": ["**/*.***]()
