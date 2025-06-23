@@ -53,12 +53,7 @@ const CabServiceCard = ({
       )}
 
       <CardContent className="p-6">
-        {/* Warning for service availability */}
-        {!isServiceAvailable && (
-          <div className="mb-4 text-red-500 text-sm">
-            ⚠️ Namma Yatri is not available in your location.
-          </div>
-        )}
+      
 
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center space-x-3">
