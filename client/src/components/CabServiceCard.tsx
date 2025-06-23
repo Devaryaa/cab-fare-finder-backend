@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Star, Clock, Users, Zap } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -26,9 +25,10 @@ export interface CabService {
 interface CabServiceCardProps {
   service: CabService;
   onSelect: (service: CabService) => void;
+  isServiceAvailable: boolean; // New prop to check service availability
 }
 
-const CabServiceCard = ({ service, onSelect }: CabServiceCardProps) => {
+const CabServiceCard = ({ service, onSelect, isServiceAvailable }: CabServiceCardProps) => {
   const discount = service.originalPrice ? 
     Math.round(((service.originalPrice - service.price) / service.originalPrice) * 100) : 0;
 
@@ -44,6 +44,13 @@ const CabServiceCard = ({ service, onSelect }: CabServiceCardProps) => {
       )}
       
       <CardContent className="p-6">
+        {/* Warning for service availability */}
+        {!isServiceAvailable && (
+          <div className="mb-4 text-red-500 text-sm">
+            ⚠️ Namma Yatri is not available in your location.
+          </div>
+        )}
+
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center space-x-3">
             <div className="w-12 h-12 bg-yellow-500 rounded-lg flex items-center justify-center text-2xl font-bold text-black">
@@ -109,6 +116,11 @@ const CabServiceCard = ({ service, onSelect }: CabServiceCardProps) => {
         </Button>
       </CardContent>
     </Card>
+  );
+};
+
+export default CabServiceCard;
+
   );
 };
 
