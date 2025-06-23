@@ -1,9 +1,9 @@
 import { storage } from './storage';
+import type { Reward } from '@shared/schema';
 
-// Seed initial rewards data
-export async function seedRewards() {
+export async function seedRewards(): Promise<void> {
   try {
-    const sampleRewards = [
+    const sampleRewards: Omit<Reward, 'id' | 'createdAt'>[] = [
       {
         title: "₹50 Ola Discount",
         description: "Get ₹50 off on your next Ola ride",
