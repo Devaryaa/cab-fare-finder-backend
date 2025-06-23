@@ -2,8 +2,8 @@
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
     "lib": ["ESNext"],
-    "types": ["node"]   // <== only keep 'node'
+    "types": ["node"]
   },
-  "include": ["."],
+  "include": [".", "types.d.ts"],   // 👈 important
   "exclude": ["node_modules", "dist"]
 }
