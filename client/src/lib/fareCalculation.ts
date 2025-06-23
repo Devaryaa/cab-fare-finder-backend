@@ -134,51 +134,49 @@ export class FareCalculator {
     };
   }
 
-  static async getNammaYatriFares(pickup: LocationData, destination: LocationData): Promise<CabFareData[]> {
-    // ✅ Block Namma Yatri only for Chandigarh
+static async getNammaYatriFares(pickup: LocationData, destination: LocationData): Promise<CabFareData[]> {
+  try {
     const isChandigarh =
-      pickup.address.toLowerCase().includes('chandigarh') ||
+      pickup.address.toLowerCase().includes("chandigarh") ||
       (pickup.lat >= 30.6 && pickup.lat <= 30.8 && pickup.lng >= 76.7 && pickup.lng <= 76.9);
 
     if (isChandigarh) {
-      console.warn('Skipping Namma Yatri in Chandigarh region');
+      console.warn("Namma Yatri not available in Chandigarh. Skipping NY.");
+      return []; // Skip Namma Yatri only in Chandigarh
+    }
+
+    const nammaPickup = convertToNammaYatriLocation(pickup);
+    const nammaDestination = convertToNammaYatriLocation(destination);
+    const response = await nammaYatriAPI.getEstimates(nammaPickup, nammaDestination);
+
+    if (!response || !response.estimates || response.estimates.length === 0) {
+      console.warn("Namma Yatri returned no estimates.");
       return [];
     }
 
-    try {
-      const nammaPickup = convertToNammaYatriLocation(pickup);
-      const nammaDrop = convertToNammaYatriLocation(destination);
-
-      const response = await nammaYatriAPI.getEstimates(nammaPickup, nammaDrop);
-
-      if (!response || !response.estimates?.length) {
-        console.warn('No estimates returned from Namma Yatri');
-        return [];
-      }
-
-      return response.estimates.map((estimate) => ({
-        serviceId: 'namma-yatri',
-        serviceName: 'Namma Yatri',
-        vehicleType: estimate.vehicleVariant,
-        fare: {
-          baseFare: estimate.baseFare,
-          distanceFare: estimate.totalFare - estimate.baseFare - estimate.pickupCharges,
-          timeFare: 0,
-          surgeMultiplier: 1.0,
-          platformFee: estimate.pickupCharges,
-          taxes: 0,
-          total: estimate.totalFare,
-        },
-        estimatedTime: `${Math.ceil(estimate.rideDuration / 60)} min`,
-        features: ['Open Source', 'No Surge Pricing', 'Driver Friendly'],
-        estimateId: estimate.estimateId,
-        searchId: response.searchId,
-      }));
-    } catch (error) {
-      console.error('Error fetching Namma Yatri fares:', error);
-      return [];
-    }
+    return response.estimates.map((estimate) => ({
+      serviceId: "namma-yatri",
+      serviceName: "Namma Yatri",
+      vehicleType: estimate.vehicleVariant,
+      fare: {
+        baseFare: estimate.baseFare,
+        distanceFare: estimate.totalFare - estimate.baseFare - estimate.pickupCharges,
+        timeFare: 0,
+        surgeMultiplier: 1.0,
+        platformFee: estimate.pickupCharges,
+        taxes: 0,
+        total: estimate.totalFare,
+      },
+      estimatedTime: `${Math.ceil(estimate.rideDuration / 60)} min`,
+      features: ["Open Source", "No Surge Pricing", "Driver Friendly", "Transparent Pricing"],
+      estimateId: estimate.estimateId,
+      searchId: response.searchId,
+    }));
+  } catch (error) {
+    console.error("Error fetching Namma Yatri fares:", error);
+    return [];
   }
+}
 
   static async calculateAllFares(
     route: RouteData,
