@@ -19,8 +19,6 @@ export interface SearchData {
   time: string;
 }
 
-const serviceableCities = ['bangalore', 'hyderabad', 'chennai'];
-
 const SearchForm = () => {
   const [pickup, setPickup] = useState<LocationData | null>(null);
   const [destination, setDestination] = useState<LocationData | null>(null);
@@ -99,45 +97,37 @@ const SearchForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!pickup || !destination) {
-      alert("Please select both pickup and destination");
-      return;
-    }
-
-    const isPickupServiceable = serviceableCities.some(city => pickup.address.toLowerCase().includes(city));
-    const isDestinationServiceable = serviceableCities.some(city => destination.address.toLowerCase().includes(city));
-
-    if (!isPickupServiceable || !isDestinationServiceable) {
-      alert("Namma Yatri is not available in your selected locations.");
-      return;
-    }
+    if (!pickup || !destination) return;
 
     const selectedDateTime = new Date(`${date}T${time}`);
-    if (selectedDateTime <= new Date()) {
-      alert("Please select a future date and time");
-      return;
-    }
+    if (selectedDateTime <= new Date()) return;
 
-    // 🔁 CALL BACKEND
+    const isPickupBlr = pickup.address.toLowerCase().includes('bengaluru');
+    const isDropBlr = destination.address.toLowerCase().includes('bengaluru');
+    const allowNammaYatri = isPickupBlr && isDropBlr;
+
     try {
       const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/fare`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           pickup: pickup.address,
           drop: destination.address
         })
       });
 
-      const result = await res.json();
-      console.log("🚕 Fare Estimates:", result.fareEstimates);
-      alert("Check console for fare estimates!");
-      // TODO: Store in state to show below
+      const data = await res.json();
+
+      const filteredFares = data.fareEstimates.filter(
+        (fare: any) =>
+          fare.provider !== 'nammaYatri' || allowNammaYatri
+      );
+
+      console.log("🚕 Filtered Fares:", filteredFares);
+      // 💡 You can store this in state and show in UI if needed
+
     } catch (err) {
       console.error("❌ Failed to fetch fare estimates", err);
-      alert("Error fetching fares.");
     }
   };
 
