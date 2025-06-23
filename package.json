@@ -4,7 +4,7 @@
   "type": "module",
   "license": "MIT",
 "scripts": {
-  "typecheck": "tsc --noEmit",
+  "typecheck": "tsc --project server/tsconfig.json --noEmit",
   "build": "npm run typecheck && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outfile=dist/index.js",
   "dev": "NODE_ENV=development tsx server/index.ts",
   "start": "NODE_ENV=production node dist/index.js",
