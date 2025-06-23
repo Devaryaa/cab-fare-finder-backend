@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "license": "MIT",
-  "scripts": {
+ "scripts": {
     "dev": "NODE_ENV=development tsx server/index.ts",
   "build": "echo 'Build skipped - using tsx to run TS directly'",
   "start": "NODE_ENV=production tsx node/index.ts",
