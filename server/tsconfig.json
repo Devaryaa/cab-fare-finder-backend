@@ -2,7 +2,7 @@
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
     "lib": ["ESNext"],
-    "types": ["node"]
+    "types": ["node", "express", "ws"]
   },
   "include": ["."],
   "exclude": ["node_modules", "dist"]
