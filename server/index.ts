@@ -1,6 +1,6 @@
 import express, { Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
-import { setupVite, serveStatic, log } from "./vite";
+//import { setupVite, serveStatic, log } from "./vite";
 import { seedRewards } from "./seedRewards";
 
 const app = express();
@@ -50,11 +50,11 @@ const USE_SERVE_STATIC = false; // Change to true if frontend is bundled here
     throw err;
   });
 
-  if (app.get("env") === "development") {
-    await setupVite(app, server);
-  } else if (USE_SERVE_STATIC) {
-    serveStatic(app);
-  }
+ // if (app.get("env") === "development") {
+//    await setupVite(app, server);
+//  } else if (USE_SERVE_STATIC) {
+//    serveStatic(app);
+//  }
 
   const port = process.env.PORT ? Number(process.env.PORT) : 5000;
   server.listen(
