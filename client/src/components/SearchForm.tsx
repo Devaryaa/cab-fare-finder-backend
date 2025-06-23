@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { MapPin, Calendar, Clock, Search, ArrowUpDown, Navigation } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -23,6 +22,8 @@ export interface SearchData {
   date: string;
   time: string;
 }
+
+const serviceableCities = ['bangalore', 'hyderabad', 'chennai']; // Define serviceable cities
 
 const SearchForm = ({ onSearch }: SearchFormProps) => {
   const [pickup, setPickup] = useState<LocationData | null>(null);
@@ -78,7 +79,6 @@ const SearchForm = ({ onSearch }: SearchFormProps) => {
     }
     
     // Allow 24/7 booking - no time restrictions
-    
     setTime(newTime);
   };
 
@@ -104,6 +104,15 @@ const SearchForm = ({ onSearch }: SearchFormProps) => {
     // Validate locations
     if (!pickup || !destination) {
       alert('Please select both pickup and destination locations');
+      return;
+    }
+
+    // Validate service availability
+    const isPickupServiceable = serviceableCities.some(city => pickup.address.toLowerCase().includes(city));
+    const isDestinationServiceable = serviceableCities.some(city => destination.address.toLowerCase().includes(city));
+
+    if (!isPickupServiceable || !isDestinationServiceable) {
+      alert('Namma Yatri is not available in your selected locations.');
       return;
     }
     
