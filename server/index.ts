@@ -46,7 +46,7 @@ const USE_SERVE_STATIC = false; // set to true ONLY if frontend is in this proje
 
     res.status(status).json({ message });
     throw err;
-  });
+  }();
 
   // Only use Vite in local development
   if (app.get("env") === "development") {
