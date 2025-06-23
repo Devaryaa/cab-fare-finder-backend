@@ -11,6 +11,8 @@ interface LocationSearchProps {
   icon?: React.ReactNode;
 }
 
+const serviceableCities = ['bangalore', 'hyderabad', 'chennai']; // Define serviceable cities
+
 const LocationSearch = ({ placeholder, value, onChange, icon }: LocationSearchProps) => {
   const [inputValue, setInputValue] = useState(value);
   const [predictions, setPredictions] = useState<google.maps.places.AutocompletePrediction[]>([]);
@@ -69,6 +71,15 @@ const LocationSearch = ({ placeholder, value, onChange, icon }: LocationSearchPr
     try {
       const locationData = await getPlaceDetails(prediction.place_id);
       setInputValue(locationData.address);
+      
+      // Check if the selected location is serviceable
+      const isServiceable = serviceableCities.some(city => locationData.address.toLowerCase().includes(city));
+      if (!isServiceable) {
+        alert('Namma Yatri is not available in your selected location.');
+        onChange(null);
+        return;
+      }
+
       onChange(locationData);
     } catch (error) {
       console.error('Error getting place details:', error);
