@@ -1,8 +1,8 @@
-import React from 'react';
-import { Star, Clock, Users, Zap } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import React from "react";
+import { Star, Clock, Users, Zap } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 export interface CabService {
   id: string;
@@ -28,21 +28,30 @@ interface CabServiceCardProps {
   isServiceAvailable: boolean; // New prop to check service availability
 }
 
-const CabServiceCard = ({ service, onSelect, isServiceAvailable }: CabServiceCardProps) => {
-  const discount = service.originalPrice ? 
-    Math.round(((service.originalPrice - service.price) / service.originalPrice) * 100) : 0;
+const CabServiceCard = ({
+  service,
+  onSelect,
+  isServiceAvailable,
+}: CabServiceCardProps) => {
+  const discount = service.originalPrice
+    ? Math.round(
+        ((service.originalPrice - service.price) / service.originalPrice) * 100,
+      )
+    : 0;
 
   return (
-    <Card className={`relative overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 bg-black border-yellow-500 ${
-      service.isRecommended ? 'ring-2 ring-yellow-500 ring-opacity-50' : ''
-    }`}>
+    <Card
+      className={`relative overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 bg-black border-yellow-500 ${
+        service.isRecommended ? "ring-2 ring-yellow-500 ring-opacity-50" : ""
+      }`}
+    >
       {service.isRecommended && (
         <div className="absolute top-0 right-0 bg-gradient-to-l from-yellow-500 to-yellow-600 text-black px-4 py-1 text-sm font-medium rounded-bl-lg">
           <Zap className="inline h-3 w-3 mr-1" />
           Recommended
         </div>
       )}
-      
+
       <CardContent className="p-6">
         {/* Warning for service availability */}
         {!isServiceAvailable && (
@@ -57,20 +66,29 @@ const CabServiceCard = ({ service, onSelect, isServiceAvailable }: CabServiceCar
               {service.logo}
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-white">{service.name}</h3>
+              <h3 className="text-lg font-semibold text-white">
+                {service.name}
+              </h3>
               <p className="text-sm text-yellow-500">{service.carType}</p>
             </div>
           </div>
-          
+
           <div className="text-right">
             <div className="flex items-center space-x-1">
               {service.originalPrice && (
-                <span className="text-sm text-gray-500 line-through">₹{service.originalPrice}</span>
+                <span className="text-sm text-gray-500 line-through">
+                  ₹{service.originalPrice}
+                </span>
               )}
-              <span className="text-2xl font-bold text-yellow-500">₹{service.price}</span>
+              <span className="text-2xl font-bold text-yellow-500">
+                ₹{service.price}
+              </span>
             </div>
             {discount > 0 && (
-              <Badge variant="destructive" className="text-xs bg-yellow-500 text-black">
+              <Badge
+                variant="destructive"
+                className="text-xs bg-yellow-500 text-black"
+              >
                 {discount}% OFF
               </Badge>
             )}
@@ -87,7 +105,7 @@ const CabServiceCard = ({ service, onSelect, isServiceAvailable }: CabServiceCar
           ) : (
             <div className="text-yellow-500 text-sm">Real-time pricing</div>
           )}
-          
+
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-1">
               <Clock className="h-4 w-4 text-yellow-500" />
@@ -102,7 +120,11 @@ const CabServiceCard = ({ service, onSelect, isServiceAvailable }: CabServiceCar
 
         <div className="flex flex-wrap gap-2 mb-4">
           {service.features.map((feature, index) => (
-            <Badge key={index} variant="secondary" className="text-xs bg-yellow-500/20 text-yellow-500 border-yellow-500">
+            <Badge
+              key={index}
+              variant="secondary"
+              className="text-xs bg-yellow-500/20 text-yellow-500 border-yellow-500"
+            >
               {feature}
             </Badge>
           ))}
@@ -116,11 +138,6 @@ const CabServiceCard = ({ service, onSelect, isServiceAvailable }: CabServiceCar
         </Button>
       </CardContent>
     </Card>
-  );
-};
-
-export default CabServiceCard;
-
   );
 };
 
