@@ -12,10 +12,6 @@ interface LocationData {
   placeId: string;
 }
 
-interface SearchFormProps {
-  onSearch: (data: SearchData) => void;
-}
-
 export interface SearchData {
   pickup: LocationData;
   destination: LocationData;
@@ -23,109 +19,51 @@ export interface SearchData {
   time: string;
 }
 
-const serviceableCities = ['bangalore', 'hyderabad', 'chennai']; // Define serviceable cities
+const serviceableCities = ['bangalore', 'hyderabad', 'chennai'];
 
-const SearchForm = ({ onSearch }: SearchFormProps) => {
+const SearchForm = () => {
   const [pickup, setPickup] = useState<LocationData | null>(null);
   const [destination, setDestination] = useState<LocationData | null>(null);
-  const [date, setDate] = useState(() => {
-    const today = new Date();
-    return today.toISOString().split('T')[0];
-  });
+  const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [time, setTime] = useState(() => {
     const now = new Date();
-    now.setMinutes(now.getMinutes() + 15); // Add 15 minutes for minimum booking time
+    now.setMinutes(now.getMinutes() + 15);
     return now.toTimeString().slice(0, 5);
   });
 
-  // Get minimum date (today)
-  const getMinDate = () => {
-    const today = new Date();
-    return today.toISOString().split('T')[0];
-  };
+  const getMinDate = () => new Date().toISOString().split('T')[0];
 
-  // Get maximum date (30 days from today)
   const getMaxDate = () => {
     const future = new Date();
     future.setDate(future.getDate() + 30);
     return future.toISOString().split('T')[0];
   };
 
-  // Validate time for today's date
   const getMinTime = () => {
-    const today = new Date();
-    const selectedDate = new Date(date);
-    
-    // If selected date is today, minimum time is current time + 15 minutes
-    if (selectedDate.toDateString() === today.toDateString()) {
-      const futureTime = new Date(today.getTime() + 15 * 60000); // Add 15 minutes
-      return futureTime.toTimeString().slice(0, 5);
+    const now = new Date();
+    const selected = new Date(date);
+    if (selected.toDateString() === now.toDateString()) {
+      now.setMinutes(now.getMinutes() + 15);
+      return now.toTimeString().slice(0, 5);
     }
-    return "00:00"; // Allow any time for future dates
+    return "00:00";
   };
 
-  // Validate time selection
   const handleTimeChange = (newTime: string) => {
-    const today = new Date();
-    const selectedDate = new Date(date);
-    
-    // If today, check minimum time
-    if (selectedDate.toDateString() === today.toDateString()) {
-      const minTime = getMinTime();
-      if (newTime < minTime) {
-        alert(`Please select a time after ${minTime} for today's bookings`);
-        return;
-      }
+    const now = new Date();
+    const selected = new Date(date);
+    if (selected.toDateString() === now.toDateString() && newTime < getMinTime()) {
+      alert(`Please select a time after ${getMinTime()} for today`);
+      return;
     }
-    
-    // Allow 24/7 booking - no time restrictions
     setTime(newTime);
   };
 
-  // Handle date change and validate time
   const handleDateChange = (newDate: string) => {
     setDate(newDate);
-    
-    // If changing to today and current time is invalid, update time
-    const today = new Date();
-    const selectedDate = new Date(newDate);
-    
-    if (selectedDate.toDateString() === today.toDateString()) {
-      const minTime = getMinTime();
-      if (time < minTime) {
-        setTime(minTime);
-      }
+    if (newDate === getMinDate() && time < getMinTime()) {
+      setTime(getMinTime());
     }
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Validate locations
-    if (!pickup || !destination) {
-      alert('Please select both pickup and destination locations');
-      return;
-    }
-
-    // Validate service availability
-    const isPickupServiceable = serviceableCities.some(city => pickup.address.toLowerCase().includes(city));
-    const isDestinationServiceable = serviceableCities.some(city => destination.address.toLowerCase().includes(city));
-
-    if (!isPickupServiceable || !isDestinationServiceable) {
-      alert('Namma Yatri is not available in your selected locations.');
-      return;
-    }
-    
-    // Validate date and time
-    const selectedDateTime = new Date(`${date}T${time}`);
-    const now = new Date();
-    
-    if (selectedDateTime <= now) {
-      alert('Please select a future date and time for your booking');
-      return;
-    }
-    
-    onSearch({ pickup, destination, date, time });
   };
 
   const swapLocations = () => {
@@ -135,30 +73,71 @@ const SearchForm = ({ onSearch }: SearchFormProps) => {
   };
 
   const getCurrentLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          try {
-            const response = await fetch(
-              `https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.coords.latitude},${position.coords.longitude}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`
-            );
-            const data = await response.json();
-            if (data.results[0]) {
-              setPickup({
-                address: data.results[0].formatted_address,
-                lat: position.coords.latitude,
-                lng: position.coords.longitude,
-                placeId: data.results[0].place_id
-              });
-            }
-          } catch (error) {
-            console.error('Error getting current location:', error);
-          }
-        },
-        (error) => {
-          console.error('Error getting location:', error);
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
+      try {
+        const res = await fetch(
+          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`
+        );
+        const data = await res.json();
+        if (data.results[0]) {
+          setPickup({
+            address: data.results[0].formatted_address,
+            lat,
+            lng,
+            placeId: data.results[0].place_id
+          });
         }
-      );
+      } catch (e) {
+        console.error("Location error", e);
+      }
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!pickup || !destination) {
+      alert("Please select both pickup and destination");
+      return;
+    }
+
+    const isPickupServiceable = serviceableCities.some(city => pickup.address.toLowerCase().includes(city));
+    const isDestinationServiceable = serviceableCities.some(city => destination.address.toLowerCase().includes(city));
+
+    if (!isPickupServiceable || !isDestinationServiceable) {
+      alert("Namma Yatri is not available in your selected locations.");
+      return;
+    }
+
+    const selectedDateTime = new Date(`${date}T${time}`);
+    if (selectedDateTime <= new Date()) {
+      alert("Please select a future date and time");
+      return;
+    }
+
+    // 🔁 CALL BACKEND
+    try {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/fare`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          pickup: pickup.address,
+          drop: destination.address
+        })
+      });
+
+      const result = await res.json();
+      console.log("🚕 Fare Estimates:", result.fareEstimates);
+      alert("Check console for fare estimates!");
+      // TODO: Store in state to show below
+    } catch (err) {
+      console.error("❌ Failed to fetch fare estimates", err);
+      alert("Error fetching fares.");
     }
   };
 
@@ -167,56 +146,48 @@ const SearchForm = ({ onSearch }: SearchFormProps) => {
       <CardContent className="p-8">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Pickup */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-yellow-500 flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-yellow-500" />
-                Pickup Location
+                <MapPin className="h-4 w-4" /> Pickup Location
               </label>
               <div className="flex gap-2">
                 <SimpleLocationSearch
-                  placeholder="Enter pickup address"
+                  placeholder="Enter pickup"
                   value={pickup?.address || ''}
                   onChange={setPickup}
                   icon={<MapPin className="h-4 w-4" />}
                 />
-                <Button
-                  type="button"
-                  onClick={getCurrentLocation}
-                  className="px-3 bg-yellow-500 hover:bg-yellow-600 text-black"
-                >
+                <Button type="button" onClick={getCurrentLocation} className="px-3 bg-yellow-500 hover:bg-yellow-600 text-black">
                   <Navigation className="h-4 w-4" />
                 </Button>
               </div>
             </div>
-            
+
+            {/* Drop */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-yellow-500 flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-yellow-500" />
-                Destination
+                <MapPin className="h-4 w-4" /> Destination
               </label>
               <div className="flex gap-2">
                 <SimpleLocationSearch
-                  placeholder="Enter destination address"
+                  placeholder="Enter destination"
                   value={destination?.address || ''}
                   onChange={setDestination}
                   icon={<MapPin className="h-4 w-4" />}
                 />
-                <Button
-                  type="button"
-                  onClick={swapLocations}
-                  className="px-3 bg-yellow-500 hover:bg-yellow-600 text-black"
-                >
+                <Button type="button" onClick={swapLocations} className="px-3 bg-yellow-500 hover:bg-yellow-600 text-black">
                   <ArrowUpDown className="h-4 w-4" />
                 </Button>
               </div>
             </div>
           </div>
 
+          {/* Date & Time */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="text-sm font-medium text-yellow-500 flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-yellow-500" />
-                Date
+                <Calendar className="h-4 w-4" /> Date
               </label>
               <Input
                 type="date"
@@ -224,31 +195,26 @@ const SearchForm = ({ onSearch }: SearchFormProps) => {
                 onChange={(e) => handleDateChange(e.target.value)}
                 min={getMinDate()}
                 max={getMaxDate()}
-                className="h-12 text-lg border-2 border-yellow-500 focus:border-yellow-400 transition-colors bg-black text-white"
+                className="h-12 text-lg border-2 border-yellow-500 bg-black text-white"
                 required
               />
             </div>
-            
             <div className="space-y-2">
               <label className="text-sm font-medium text-yellow-500 flex items-center gap-2">
-                <Clock className="h-4 w-4 text-yellow-500" />
-                Time
+                <Clock className="h-4 w-4" /> Time
               </label>
               <Input
                 type="time"
                 value={time}
                 onChange={(e) => handleTimeChange(e.target.value)}
                 min={getMinTime()}
-                className="h-12 text-lg border-2 border-yellow-500 focus:border-yellow-400 transition-colors bg-black text-white"
+                className="h-12 text-lg border-2 border-yellow-500 bg-black text-white"
                 required
               />
             </div>
           </div>
 
-          <Button
-            type="submit"
-            className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black transition-all duration-300 transform hover:scale-105 shadow-lg"
-          >
+          <Button type="submit" className="w-full h-14 text-lg font-semibold bg-yellow-500 hover:bg-yellow-600 text-black shadow-md">
             <Search className="mr-2 h-5 w-5" />
             Compare Prices
           </Button>
