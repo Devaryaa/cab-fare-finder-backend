@@ -135,22 +135,26 @@ export class FareCalculator {
   }
 
 static async getNammaYatriFares(pickup: LocationData, destination: LocationData): Promise<CabFareData[]> {
+  const isChandigarh =
+    pickup.address.toLowerCase().includes("chandigarh") ||
+    (
+      pickup.lat >= 30.6 &&
+      pickup.lat <= 30.8 &&
+      pickup.lng >= 76.7 &&
+      pickup.lng <= 76.9
+    );
+
+  if (isChandigarh) {
+    return []; // Silently skip Namma Yatri
+  }
+
   try {
-    const isChandigarh =
-      pickup.address.toLowerCase().includes("chandigarh") ||
-      (pickup.lat >= 30.6 && pickup.lat <= 30.8 && pickup.lng >= 76.7 && pickup.lng <= 76.9);
-
-    if (isChandigarh) {
-      console.warn("Namma Yatri not available in Chandigarh. Skipping NY.");
-      return []; // Skip Namma Yatri only in Chandigarh
-    }
-
     const nammaPickup = convertToNammaYatriLocation(pickup);
     const nammaDestination = convertToNammaYatriLocation(destination);
+
     const response = await nammaYatriAPI.getEstimates(nammaPickup, nammaDestination);
 
-    if (!response || !response.estimates || response.estimates.length === 0) {
-      console.warn("Namma Yatri returned no estimates.");
+    if (!response || !response.estimates.length) {
       return [];
     }
 
@@ -173,10 +177,10 @@ static async getNammaYatriFares(pickup: LocationData, destination: LocationData)
       searchId: response.searchId,
     }));
   } catch (error) {
-    console.error("Error fetching Namma Yatri fares:", error);
     return [];
   }
 }
+
 
   static async calculateAllFares(
     route: RouteData,
