@@ -96,7 +96,7 @@ const SearchForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    console.log("✅ Compare button clicked");
     if (!pickup || !destination) return;
 
     const selectedDateTime = new Date(`${date}T${time}`);
