@@ -192,6 +192,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Server error" });
     }
   });
+// Fare Comparison API
+app.post("/api/fare", async (req, res) => {
+  try {
+    const { pickup, drop } = z
+      .object({
+        pickup: z.string().min(1),
+        drop: z.string().min(1),
+      })
+      .parse(req.body);
+
+    // Fake fare data — replace with actual fare logic later
+    const fares = [
+      { provider: "Uber", estimate: 220 },
+      { provider: "Ola", estimate: 200 },
+    ];
+
+    const bengaluruKeywords = ['bengaluru', 'bangalore', 'btm', 'koramangala', 'indiranagar', 'hebbal'];
+    const isInBangalore = (address: string) =>
+      bengaluruKeywords.some((kw) => address.toLowerCase().includes(kw));
+
+    if (isInBangalore(pickup) && isInBangalore(drop)) {
+      fares.push({ provider: "Namma Yatri", estimate: 180 });
+    }
+
+    res.json({ fareEstimates: fares });
+  } catch (err) {
+    console.error("❌ Fare compare error:", err);
+    res.status(400).json({ message: "Invalid request" });
+  }
+});
 
   const httpServer = createServer(app);
 
