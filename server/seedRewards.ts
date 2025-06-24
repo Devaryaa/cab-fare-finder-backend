@@ -1,5 +1,5 @@
-import { storage } from './storage';
-import type { Reward } from '@shared/schema';
+import { storage } from './storage.js'; // Added .js extension
+import type { Reward } from '../shared/schema.js'; // Adjusted import path
 
 export async function seedRewards(): Promise<void> {
   try {
