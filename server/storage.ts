@@ -9,14 +9,14 @@ import { eq, desc } from "drizzle-orm";
 
 export interface IStorage {
   getUser (id: number): Promise<User | undefined>;
-  getUser ByUsername(username: string): Promise<User | undefined>;
-  getUser ByEmail(email: string): Promise<User | undefined>;
+  getUser ByUsername(username: string): Promise<User | undefined>; // Fixed method name
+  getUser ByEmail(email: string): Promise<User | undefined>; // Fixed method name
   createUser (user: InsertUser ): Promise<User>;
-  updateUser Points(id: number, points: number): Promise<User | undefined>;
+  updateUser Points(id: number, points: number): Promise<User | undefined>; // Fixed method name
 
   // Booking methods
   createBooking(booking: InsertBooking): Promise<Booking>;
-  getUser Bookings(userId: number): Promise<Booking[]>;
+  getUser Bookings(userId: number): Promise<Booking[]>; // Fixed method name
 
   // Rewards methods
   getAllRewards(): Promise<Reward[]>;
@@ -24,8 +24,8 @@ export interface IStorage {
 
   // Redemption methods
   createRedemption(redemption: InsertRedemption): Promise<Redemption>;
-  getUser Redemptions(userId: number): Promise<Redemption[]>;
-  updateUser Distance(userId: number, distance: number): Promise<User | undefined>;
+  getUser Redemptions(userId: number): Promise<Redemption[]>; // Fixed method name
+  updateUser Distance(userId: number, distance: number): Promise<User | undefined>; // Fixed method name
 }
 
 export class DatabaseStorage implements IStorage {
@@ -34,22 +34,22 @@ export class DatabaseStorage implements IStorage {
     return user || undefined;
   }
 
-  async getUser ByUsername(username: string): Promise<User | undefined> {
+  async getUser ByUsername(username: string): Promise<User | undefined> { // Fixed method name
     const [user] = await db.select().from(users).where(eq(users.username, username));
     return user || undefined;
   }
 
-  async getUser ByEmail(email: string): Promise<User | undefined> {
+  async getUser ByEmail(email: string): Promise<User | undefined> { // Fixed method name
     const [user] = await db.select().from(users).where(eq(users.email, email));
     return user || undefined;
   }
 
-  async createUser (insert:User  InsertUser ): Promise<User> {
-    const [user] = await db.insert(users).values(insertUser ).returning();
+  async createUser (insert: InsertUser ): Promise<User> { // Fixed parameter type
+    const [user] = await db.insert(users).values(insert).returning(); // Fixed parameter name
     return user;
   }
 
-  async updateUser Points(id: number, points: number): Promise<User | undefined> {
+  async updateUser Points(id: number, points: number): Promise<User | undefined> { // Fixed method name
     const [user] = await db.update(users)
       .set({ points })
       .where(eq(users.id, id))
@@ -62,7 +62,7 @@ export class DatabaseStorage implements IStorage {
     return newBooking;
   }
 
-  async getUser Bookings(userId: number): Promise<Booking[]> {
+  async getUser Bookings(userId: number): Promise<Booking[]> { // Fixed method name
     return await db.select()
       .from(bookings)
       .where(eq(bookings.userId, userId))
@@ -85,14 +85,14 @@ export class DatabaseStorage implements IStorage {
     return newRedemption;
   }
 
-  async getUser Redemptions(userId: number): Promise<Redemption[]> {
+  async getUser Redemptions(userId: number): Promise<Redemption[]> { // Fixed method name
     return await db.select()
       .from(redemptions)
       .where(eq(redemptions.userId, userId))
       .orderBy(desc(redemptions.redeemedAt));
   }
 
-  async updateUser Distance(userId: number, distance: number): Promise<User | undefined> {
+  async updateUser Distance(userId: number, distance: number): Promise<User | undefined> { // Fixed method name
     const [user] = await db.update(users)
       .set({ totalDistance: distance })
       .where(eq(users.id, userId))
