@@ -1,22 +1,22 @@
 import { 
   users, bookings, rewards, redemptions, 
-  type User, type InsertUser , 
+  type User, type InsertUser, 
   type Booking, type InsertBooking, 
   type Reward, type Redemption, type InsertRedemption 
-} from "../shared/schema.js"; // Adjusted import path
+} from "../shared/schema.js";
 import { db } from "./db.js";
 import { eq, desc } from "drizzle-orm";
 
 export interface IStorage {
-  getUser (id: number): Promise<User | undefined>;
-  getUser ByUsername(username: string): Promise<User | undefined>; // Fixed method name
-  getUser ByEmail(email: string): Promise<User | undefined>; // Fixed method name
-  createUser (user: InsertUser ): Promise<User>;
-  updateUser Points(id: number, points: number): Promise<User | undefined>; // Fixed method name
+  getUser(id: number): Promise<User | undefined>;
+  getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
+  createUser(user: InsertUser): Promise<User>;
+  updateUserPoints(id: number, points: number): Promise<User | undefined>;
 
   // Booking methods
   createBooking(booking: InsertBooking): Promise<Booking>;
-  getUser Bookings(userId: number): Promise<Booking[]>; // Fixed method name
+  getUserBookings(userId: number): Promise<Booking[]>;
 
   // Rewards methods
   getAllRewards(): Promise<Reward[]>;
@@ -24,32 +24,32 @@ export interface IStorage {
 
   // Redemption methods
   createRedemption(redemption: InsertRedemption): Promise<Redemption>;
-  getUser Redemptions(userId: number): Promise<Redemption[]>; // Fixed method name
-  updateUser Distance(userId: number, distance: number): Promise<User | undefined>; // Fixed method name
+  getUserRedemptions(userId: number): Promise<Redemption[]>;
+  updateUserDistance(userId: number, distance: number): Promise<User | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
-  async getUser (id: number): Promise<User | undefined> {
+  async getUser(id: number): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user || undefined;
   }
 
-  async getUser ByUsername(username: string): Promise<User | undefined> { // Fixed method name
+  async getUserByUsername(username: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.username, username));
     return user || undefined;
   }
 
-  async getUser ByEmail(email: string): Promise<User | undefined> { // Fixed method name
+  async getUserByEmail(email: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.email, email));
     return user || undefined;
   }
 
-  async createUser (insert: InsertUser ): Promise<User> { // Fixed parameter type
-    const [user] = await db.insert(users).values(insert).returning(); // Fixed parameter name
+  async createUser(insert: InsertUser): Promise<User> {
+    const [user] = await db.insert(users).values(insert).returning();
     return user;
   }
 
-  async updateUser Points(id: number, points: number): Promise<User | undefined> { // Fixed method name
+  async updateUserPoints(id: number, points: number): Promise<User | undefined> {
     const [user] = await db.update(users)
       .set({ points })
       .where(eq(users.id, id))
@@ -62,7 +62,7 @@ export class DatabaseStorage implements IStorage {
     return newBooking;
   }
 
-  async getUser Bookings(userId: number): Promise<Booking[]> { // Fixed method name
+  async getUserBookings(userId: number): Promise<Booking[]> {
     return await db.select()
       .from(bookings)
       .where(eq(bookings.userId, userId))
@@ -85,14 +85,14 @@ export class DatabaseStorage implements IStorage {
     return newRedemption;
   }
 
-  async getUser Redemptions(userId: number): Promise<Redemption[]> { // Fixed method name
+  async getUserRedemptions(userId: number): Promise<Redemption[]> {
     return await db.select()
       .from(redemptions)
       .where(eq(redemptions.userId, userId))
       .orderBy(desc(redemptions.redeemedAt));
   }
 
-  async updateUser Distance(userId: number, distance: number): Promise<User | undefined> { // Fixed method name
+  async updateUserDistance(userId: number, distance: number): Promise<User | undefined> {
     const [user] = await db.update(users)
       .set({ totalDistance: distance })
       .where(eq(users.id, userId))
