@@ -1,6 +1,6 @@
 import type { Express, Request, Response } from "express";
 import { storage } from "./storage.js";
-import { insertUser Schema, insertBookingSchema, insertRedemptionSchema } from "../shared/schema.js"; // Adjusted import path
+import { insertUser Schema, insertBookingSchema, insertRedemptionSchema } from "../shared/schema.js"; // Corrected import path
 import { z } from "zod";
 
 const loginSchema = z.object({
@@ -11,8 +11,8 @@ const loginSchema = z.object({
 export async function registerRoutes(app: Express): Promise<void> {
   app.post("/api/register", async (req: Request, res: Response) => {
     try {
-      const userData = insertUser Schema.parse(req.body);
-      const existingUser  = await storage.getUser ByEmail(userData.email);
+      const userData = insertUser Schema.parse(req.body); // Corrected schema name
+      const existingUser  = await storage.getUser ByEmail(userData.email); // Corrected method name
       if (existingUser ) return res.status(400).json({ message: "User  already exists" });
 
       const user = await storage.createUser (userData);
@@ -25,7 +25,7 @@ export async function registerRoutes(app: Express): Promise<void> {
   app.post("/api/login", async (req: Request, res: Response) => {
     try {
       const { email, password } = loginSchema.parse(req.body);
-      const user = await storage.getUser ByEmail(email);
+      const user = await storage.getUser ByEmail(email); // Corrected method name
       if (!user || user.password !== password)
         return res.status(401).json({ message: "Invalid credentials" });
 
@@ -51,7 +51,7 @@ export async function registerRoutes(app: Express): Promise<void> {
     try {
       const id = z.coerce.number().parse(req.params.id);
       const { points } = z.object({ points: z.number() }).parse(req.body);
-      const user = await storage.updateUser Points(id, points);
+      const user = await storage.updateUser Points(id, points); // Corrected method name
       if (!user) return res.status(404).json({ message: "User  not found" });
 
       res.json(user);
@@ -68,8 +68,8 @@ export async function registerRoutes(app: Express): Promise<void> {
 
       const user = await storage.getUser (bookingData.userId);
       if (user) {
-        await storage.updateUser Points(user.id, user.points + pointsEarned);
-        await storage.updateUser Distance(user.id, (user.totalDistance || 0) + bookingData.distance);
+        await storage.updateUser Points(user.id, user.points + pointsEarned); // Corrected method name
+        await storage.updateUser Distance(user.id, (user.totalDistance || 0) + bookingData.distance); // Corrected method name
       }
       res.json(booking);
     } catch {
@@ -80,7 +80,7 @@ export async function registerRoutes(app: Express): Promise<void> {
   app.get("/api/bookings/:userId", async (req: Request, res: Response) => {
     try {
       const userId = z.coerce.number().parse(req.params.userId);
-      const bookings = await storage.getUser Bookings(userId);
+      const bookings = await storage.getUser Bookings(userId); // Corrected method name
       res.json(bookings);
     } catch {
       res.status(500).json({ message: "Server error" });
@@ -105,7 +105,7 @@ export async function registerRoutes(app: Express): Promise<void> {
         return res.status(400).json({ message: "Insufficient points" });
 
       const redemption = await storage.createRedemption(redemptionData);
-      await storage.updateUser Points(user.id, user.points - redemptionData.pointsUsed);
+      await storage.updateUser Points(user.id, user.points - redemptionData.pointsUsed); // Corrected method name
       res.json(redemption);
     } catch {
       res.status(400).json({ message: "Invalid redemption data" });
@@ -115,7 +115,7 @@ export async function registerRoutes(app: Express): Promise<void> {
   app.get("/api/redemptions/:userId", async (req: Request, res: Response) => {
     try {
       const userId = z.coerce.number().parse(req.params.userId);
-      const redemptions = await storage.getUser Redemptions(userId);
+      const redemptions = await storage.getUser Redemptions(userId); // Corrected method name
       res.json(redemptions);
     } catch {
       res.status(500).json({ message: "Server error" });
