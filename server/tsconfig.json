@@ -4,7 +4,7 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "outDir": "./dist",
-    "rootDir": "./",
+    "rootDir": "./server",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -12,6 +12,6 @@
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true
   },
-  "include": ["**/*.ts"],
+  "include": ["server/**/*.ts", "shared/**/*.ts"],
   "exclude": ["dist", "node_modules"]
 }
